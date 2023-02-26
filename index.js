@@ -58,13 +58,20 @@ async function main() {
   const cookies = await page.$('#gdpr-new-container')
   if (cookies !== null) await page.click('button[data-role="gdpr-accept"]')
   // Click on the country/region selector
-  await page.click('#switcher-info')
-  await page.waitForSelector('.switcher-shipto .country-selector')
-  await page.waitForTimeout(1000)
-  await page.click('.switcher-shipto .country-selector')
-  await page.click('.address-select-content li[data-name="Hungary"]')
-  await page.click('button[data-role="save"]')
-  await page.waitForNavigation()
+  let screenBase64
+  try {
+    await page.click('#switcher-info')
+    await page.waitForSelector('.switcher-shipto .country-selector')
+    new Promise(r => setTimeout(r, 1000))
+    await page.screenshot({ path: __dirname + '/screen.png' })
+    screenBase64 = fs.readFileSync(__dirname + '/screen.png', 'base64')
+    await page.click('.switcher-shipto .country-selector')
+    await page.click('.address-select-content li[data-name="Hungary"]')
+    await page.click('button[data-role="save"]')
+    await page.waitForNavigation()
+  } catch (e) {
+    console.log(screenBase64)
+  }
 
   // scroll down a bit for more offers
   await page.evaluate(() => {
@@ -73,7 +80,7 @@ async function main() {
       element.scrollIntoView({ behavior: 'smooth' })
     }
   })
-  await page.waitForTimeout(6000)
+  new Promise(r => setTimeout(r, 6000))
   // zoom out to load all offers
   await page.evaluate(() => (document.body.style.zoom = 0.7))
   // create object
@@ -158,7 +165,7 @@ async function main() {
   else {
     await requestPromise(
       {
-        url: secret, 
+        url: secret,
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain'
