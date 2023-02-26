@@ -19,5 +19,5 @@ jobs:
         run: yarn
       - name: Run main script
         env:
-          WEBHOOK_URL_PROD: ${{ secrets.WEBHOOK_URL_LEPIN }}
+          WEBHOOK_URL_LEPIN: ${{ secrets.WEBHOOK_URL_LEPIN }}
         run: node index.js
