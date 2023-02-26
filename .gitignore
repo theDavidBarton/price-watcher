@@ -1,4 +1,5 @@
 *.env
+*.png
 # Logs
 logs
 *.log
