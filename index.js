@@ -11,6 +11,14 @@ if (!secret) {
 }
 
 async function main() {
+  const cookie = {
+    name: 'aep_usuc_f',
+    value: 'site=glo&c_tp=HUF&x_alimid=4432579547&ups_d=1|1|1|1&isb=y&ups_u_t=1691674248522&region=HU&b_locale=en_US&ae_u_p_s=2',
+    domain: '.aliexpress.com',
+    path: '/',
+    httpOnly: true,
+    secure: true
+}
   const agentList = [
     // https://techblog.willshouse.com/2012/01/03/most-common-user-agents/
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
@@ -34,7 +42,9 @@ async function main() {
     args: ['--window-size=1400,900', '--single-process', '--no-zygote', '--no-sandbox']
   })
   const page = await browser.newPage()
+  await page.setCookie(cookie)
   await page.setUserAgent(realUserAgent)
+  await page.setGeolocation({ latitude: 47.4813602, longitude: 18.9902192 })
 
   // *********** Hogwarts
   const hogwarts = {
@@ -57,14 +67,6 @@ async function main() {
 
   const cookies = await page.$('#gdpr-new-container')
   if (cookies !== null) await page.click('button[data-role="gdpr-accept"]')
-  // Click on the country/region selector
-  await page.click('#switcher-info')
-  await page.waitForSelector('.switcher-shipto .country-selector')
-  await page.waitForTimeout(1000)
-  await page.click('.switcher-shipto .country-selector')
-  await page.click('.address-select-content li[data-name="Hungary"]')
-  await page.click('button[data-role="save"]')
-  await page.waitForNavigation()
 
   // scroll down a bit for more offers
   await page.evaluate(() => {
@@ -73,7 +75,7 @@ async function main() {
       element.scrollIntoView({ behavior: 'smooth' })
     }
   })
-  await page.waitForTimeout(6000)
+  await new Promise(r => setTimeout(r, 3000))
   // zoom out to load all offers
   await page.evaluate(() => (document.body.style.zoom = 0.7))
   // create object
@@ -158,7 +160,7 @@ async function main() {
   else {
     await requestPromise(
       {
-        url: secret, 
+        url: secret,
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain'
