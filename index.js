@@ -61,16 +61,17 @@ async function main() {
   let screenBase64
   try {
     await page.click('#switcher-info')
-    await page.waitForSelector('.switcher-shipto .country-selector')
-    new Promise(r => setTimeout(r, 1000))
+    await page.waitForSelector('.switcher-shipto .country-selector')    
     await page.screenshot({ path: __dirname + '/screen.png' })
     screenBase64 = fs.readFileSync(__dirname + '/screen.png', 'base64')
+    new Promise(r => setTimeout(r, 1000))
     await page.click('.switcher-shipto .country-selector')
     await page.click('.address-select-content li[data-name="Hungary"]')
     await page.click('button[data-role="save"]')
     await page.waitForNavigation()
   } catch (e) {
-    console.log(screenBase64)
+    console.log(screenBase64 + '\n-----------------')
+    console.error(e)
   }
 
   // scroll down a bit for more offers
