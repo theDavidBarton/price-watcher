@@ -35,6 +35,7 @@ async function main() {
   })
   const page = await browser.newPage()
   await page.setUserAgent(realUserAgent)
+  await page.setGeolocation({ latitude: 47.4813602, longitude: 18.9902192 })
 
   // *********** Hogwarts
   const hogwarts = {
@@ -59,18 +60,20 @@ async function main() {
   if (cookies !== null) await page.click('button[data-role="gdpr-accept"]')
   // Click on the country/region selector
   let screenBase64
+  let body
   try {
     await page.click('#switcher-info')
-    await page.waitForSelector('.switcher-shipto .country-selector')    
+    await page.waitForSelector('.switcher-shipto .country-selector')
     await page.screenshot({ path: __dirname + '/screen.png' })
     screenBase64 = fs.readFileSync(__dirname + '/screen.png', 'base64')
+    body = await page.$eval('body', el => el.innerText)
     new Promise(r => setTimeout(r, 1000))
     await page.click('.switcher-shipto .country-selector')
     await page.click('.address-select-content li[data-name="Hungary"]')
     await page.click('button[data-role="save"]')
     await page.waitForNavigation()
   } catch (e) {
-    console.log(screenBase64 + '\n-----------------')
+    console.log(screenBase64 + '\n-----------------' + body + '\n-----------------')
     console.error(e)
   }
 
