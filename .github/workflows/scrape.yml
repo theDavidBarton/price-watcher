@@ -1,0 +1,23 @@
+name: scrape
+
+on:
+  schedule:
+    - cron: '15 8 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  scrape-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Install project
+        run: yarn
+      - name: Run main script
+        env:
+          WEBHOOK_URL_PROD: ${{ secrets.WEBHOOK_URL_LEPIN }}
+        run: node index.js
