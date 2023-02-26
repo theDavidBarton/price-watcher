@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 const util = require('util')
 const request = require('request')
-// const fs = require('fs')
+const fs = require('fs')
 const requestPromise = util.promisify(request) // https://stackoverflow.com/a/54667338/12412595
 
 const secret = process.env.WEBHOOK_URL_LEPIN // set in pipeline variable
