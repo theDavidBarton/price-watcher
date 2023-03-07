@@ -51,7 +51,7 @@ async function main() {
     id: '71043',
     name: 'Hogwarts Castle',
     keyword: 'school|castle',
-    url: 'https://www.aliexpress.com/af/71043.html?SearchText=71043&maxPrice=110000.0&minPrice=45000.0&sortType=price_asc'
+    url: 'https://m.aliexpress.com/wholesale/71043.html?SearchText=71043&g=y&maxPrice=110000.0&maxprice=110000&minPrice=35000.0&minprice=35000&sorttype=price_asc&trafficChannel=seo&gatewayAdapt=Pc2Msite'
   }
 
   // ********** Star Wars
@@ -59,7 +59,7 @@ async function main() {
     id: '75252',
     name: 'Star Destroyer',
     keyword: 'destroyer',
-    url: 'https://www.aliexpress.com/af/75252.html?SearchText=75252&sortType=price_asc&minPrice=35000&maxPrice=110000'
+    url: 'https://m.aliexpress.com/wholesale/75252.html?SearchText=75252&g=y&maxPrice=110000.0&maxprice=110000&minPrice=35000.0&minprice=35000&sorttype=price_asc&trafficChannel=seo&gatewayAdapt=Pc2Msite' 
   }
   // select the LEPIN set
   const target = starWars // hogwarts
@@ -70,7 +70,13 @@ async function main() {
 
   // scroll down a bit for more offers
   await page.evaluate(() => {
-    const element = document.querySelector('div[class*=list--gallery]')
+    const element = document.querySelector('._2_Bq1')
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
     }
@@ -80,25 +86,23 @@ async function main() {
   await page.evaluate(() => (document.body.style.zoom = 0.7))
   // create object
   const items = await page.evaluate(() => {
-    const cards = document.querySelectorAll('a[class*=manhattan--container]')
+    const cards = document.querySelectorAll('a._1lP57._3FPIS')
 
     const items = Array.from(cards).map((el, i) => {
       const links = el
-      const prices = el.querySelector('div[class*=price--]')
-      const images = el.querySelector('img[class*=img--]')
-      const shipping = el.querySelector('div[class*=topList--]')
+      const prices = el.querySelector('div.WvaUg')
+      const titles = el.querySelector('h1.WccSj')
+      const images = el.querySelector('img.product-img')
+      const shipping = el.querySelector('div._1dbRT')
       const stores = el.querySelector('span[class*=store--]')
-      const sold = el.querySelector('span[class*=trade--]')
-      const rated = el.querySelector('span[class*=evaluation--]')
+      const sold = el.querySelector('span._2PeJI')
+      const rated = el.querySelector('span._3cSMn')
 
       return {
         _id: i + 1,
-        link: links.href.replace(/\?.*/, ''),
-        title: images?.src
-          .split('/')[5]
-          .replace(/-/g, ' ')
-          .replace(/\.jpg.*/, ''),
-        price: prices.innerText,
+        link: links?.href?.replace(/\?.*/, ''),
+        title: titles?.innerText,
+        price: prices?.innerText,
         image: images?.src,
         shipping: shipping?.innerText ? shipping?.innerText.replace(/\+/, '') : 'n/a',
         store: stores?.innerText,
@@ -109,7 +113,10 @@ async function main() {
     return items
   })
   const filteredItems = items.filter(
-    e => e.image?.match(new RegExp(target.keyword, 'gi')) && !e.image?.match(/led|light|super.star.destroyer/gi)
+    e =>
+      e.title?.match(new RegExp(target.keyword, 'gi')) &&
+      !e.title?.match(/led|light|super.star.destroyer/gi) &&
+      parseInt(e.price?.replace(/^HUF|,/g, '')) < 111000
   )
   // console.log(filteredItems)
 
@@ -141,13 +148,13 @@ async function main() {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*${el.title}* _(from <${el.link}|${el.store}>)_ \n• *price:* ${el.price} + ${el.shipping}\n• *sold:* ${
+        text: `*${el.title}* _(from <${el.link}|this seller>)_ \n• *price:* ${el.price} + ${el.shipping}\n• *sold:* ${
           el.sold
         }\n• *rated:* ${el.rated}${el.rated > 0 ? '★' : ''}`
       },
       accessory: {
         type: 'image',
-        image_url: el.image,
+        image_url: el.image ? el.image : 'https://i.etsystatic.com/13575415/r/il/94ee96/1210017425/il_570xN.1210017425_8pym.jpg',
         alt_text: el.title
       }
     })

@@ -1,5 +1,7 @@
 *.env
 *.png
+msg_TEMP.json
+
 # Logs
 logs
 *.log
